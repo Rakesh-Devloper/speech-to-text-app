@@ -2,9 +2,16 @@
   "name": "backend",
   "version": "1.0.0",
   "main": "index.js",
+
+
   "scripts": {
+<<<<<<< HEAD
     "start": "node server.js",
     "dev": "nodemon server.js"
+=======
+    "start":"node server.js",
+    "dev":"nodemon server.js"
+>>>>>>> be01f3123430ae524cdf7d479c658a7cef741447
   },
   "keywords": [],
   "author": "",
