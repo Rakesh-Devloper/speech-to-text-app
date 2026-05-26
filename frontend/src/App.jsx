@@ -24,25 +24,21 @@ function App() {
   const [loading, setLoading] =
     useState(false);
 
+  const [error, setError] =
+    useState("");
 
   // Refs
   const mediaRecorderRef = useRef(null);
 
   const audioChunksRef = useRef([]);
 
-
   // Fetch Previous Transcriptions
   useEffect(() => {
-
     fetchHistory();
-
   }, []);
 
-
   const fetchHistory = async () => {
-
     try {
-
       const response = await axios.get(
         "http://localhost:5000/transcriptions"
       );
@@ -55,22 +51,35 @@ function App() {
     }
   };
 
-
   // Handle File Upload
   const handleFileUpload = (e) => {
 
     const file = e.target.files[0];
 
+    if (!file) return;
+
+    if (!file.type.startsWith("audio/")) {
+
+      setError(
+        "Please upload a valid audio file"
+      );
+
+      return;
+    }
+
+    setError("");
+
     setSelectedFile(file);
   };
 
-
-  // Upload Audio to Backend
+  // Upload Audio
   const uploadAudio = async () => {
 
     if (!selectedFile) {
 
-      alert("Please select an audio file");
+      setError(
+        "Please select an audio file"
+      );
 
       return;
     }
@@ -79,9 +88,14 @@ function App() {
 
       setLoading(true);
 
+      setError("");
+
       const formData = new FormData();
 
-      formData.append("audio", selectedFile);
+      formData.append(
+        "audio",
+        selectedFile
+      );
 
       await axios.post(
         "http://localhost:5000/upload",
@@ -98,10 +112,12 @@ function App() {
 
       setLoading(false);
 
-      alert("Transcription failed");
+      setError(
+        error.response?.data?.error ||
+        "Transcription failed"
+      );
     }
   };
-
 
   // Start Recording
   const startRecording = async () => {
@@ -119,8 +135,6 @@ function App() {
 
     audioChunksRef.current = [];
 
-
-    // Store Audio Chunks
     mediaRecorder.ondataavailable = (
       event
     ) => {
@@ -130,8 +144,6 @@ function App() {
       );
     };
 
-
-    // When Recording Stops
     mediaRecorder.onstop = async () => {
 
       const audioBlob = new Blob(
@@ -173,18 +185,16 @@ function App() {
 
         setLoading(false);
 
-        alert(
+        setError(
           "Recording transcription failed"
         );
       }
     };
 
-
     mediaRecorder.start();
 
     setRecording(true);
   };
-
 
   // Stop Recording
   const stopRecording = () => {
@@ -194,51 +204,40 @@ function App() {
     setRecording(false);
   };
 
-
   return (
 
-    <div className="min-h-screen bg-gradient-to-br from-blue-100 via-white to-purple-100 flex justify-center items-center p-6">
+    <div className="min-h-screen bg-gray-100 p-8">
 
-      <div className="bg-white/80 backdrop-blur-md shadow-2xl rounded-3xl p-8 w-full max-w-3xl border border-white/30 transition-all duration-300">
+      <div className="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-lg">
 
-        <h1 className="text-5xl font-extrabold text-center mb-8 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent tracking-tight">
+        <h1 className="text-4xl font-bold text-center mb-8">
 
-          🎤 Speech To Text App
+          Speech To Text App
 
         </h1>
 
+        {/* Error Message */}
+        {error && (
 
-        {/* File Upload */}
+          <div className="bg-red-100 text-red-700 p-3 rounded-lg mb-5">
+
+            {error}
+
+          </div>
+        )}
+
+        {/* Upload */}
         <div className="mb-8">
-
-          <label className="block font-semibold mb-3 text-lg text-gray-700">
-
-            Upload Audio File
-
-          </label>
 
           <input
             type="file"
             accept="audio/*"
             onChange={handleFileUpload}
-            className="w-full border border-gray-300 p-3 rounded-xl bg-white shadow-sm"
           />
 
-
-          {selectedFile && (
-
-            <p className="mt-3 text-green-600 font-medium">
-
-              Selected: {selectedFile.name}
-
-            </p>
-          )}
-
-
-          {/* Upload Button */}
           <button
             onClick={uploadAudio}
-            className="mt-5 bg-gradient-to-r from-blue-500 to-indigo-600 hover:scale-105 hover:shadow-xl transition-all duration-300 text-white px-6 py-3 rounded-xl font-semibold"
+            className="bg-blue-500 text-white px-5 py-2 rounded-lg ml-3"
           >
 
             Upload & Transcribe
@@ -247,25 +246,17 @@ function App() {
 
         </div>
 
-
-        {/* Recording Section */}
+        {/* Recording */}
         <div className="mb-8">
-
-          <label className="block font-semibold mb-3 text-lg text-gray-700">
-
-            Record Audio
-
-          </label>
-
 
           {!recording ? (
 
             <button
               onClick={startRecording}
-              className="bg-gradient-to-r from-red-500 to-pink-600 hover:scale-105 hover:shadow-xl transition-all duration-300 text-white px-6 py-3 rounded-xl font-semibold"
+              className="bg-red-500 text-white px-5 py-2 rounded-lg"
             >
 
-              🎙 Start Recording
+              Start Recording
 
             </button>
 
@@ -273,107 +264,60 @@ function App() {
 
             <button
               onClick={stopRecording}
-              className="bg-gradient-to-r from-gray-700 to-black hover:scale-105 hover:shadow-xl transition-all duration-300 text-white px-6 py-3 rounded-xl font-semibold"
+              className="bg-black text-white px-5 py-2 rounded-lg"
             >
 
-              ⏹ Stop Recording
+              Stop Recording
 
             </button>
           )}
-
 
           {audioURL && (
 
             <audio
               controls
               src={audioURL}
-              className="mt-5 w-full rounded-xl"
+              className="mt-5"
             />
           )}
 
         </div>
 
-
         {/* Loading */}
         {loading && (
-
-          <div className="mb-6 flex items-center gap-3">
-
-            <div className="w-4 h-4 rounded-full bg-blue-500 animate-bounce"></div>
-
-            <p className="text-blue-600 font-semibold text-lg">
-
-              Generating transcription...
-
-            </p>
-
-          </div>
+          <p className="text-blue-500 mb-5">
+            Generating transcription...
+          </p>
         )}
-
 
         {/* Transcriptions */}
         <div>
 
-          <h2 className="text-3xl font-bold mb-5 text-gray-800">
+          <h2 className="text-2xl font-bold mb-5">
 
             Previous Transcriptions
 
           </h2>
 
+          {transcriptions.map((item) => (
 
-          <div className="bg-gray-50 border border-gray-200 rounded-2xl p-5 space-y-4">
+            <div
+              key={item._id}
+              className="border p-4 rounded-lg mb-4"
+            >
 
-            {transcriptions.length > 0 ? (
+              <h3 className="font-bold">
 
-              transcriptions.map((item) => (
+                {item.fileName}
 
-                <div
-                  key={item._id}
-                  className="bg-white/90 border border-gray-200 p-5 rounded-2xl shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
-                >
+              </h3>
 
-                  <h3 className="font-bold text-xl text-blue-700 mb-2">
+              <p>
+                {item.transcription}
+              </p>
 
-                    {item.fileName}
-
-                  </h3>
-
-                  <p className="mt-2 text-gray-700 leading-relaxed">
-
-                    {item.transcription}
-
-                  </p>
-
-                  <small className="text-gray-400 italic block mt-3">
-
-                    {new Date(
-                      item.createdAt
-                    ).toLocaleString()}
-
-                  </small>
-
-                </div>
-              ))
-
-            ) : (
-
-              <div className="text-center py-10">
-
-                <p className="text-4xl">
-                  🎤
-                </p>
-
-                <p className="text-gray-500 mt-3 text-lg">
-
-                  No transcriptions yet.
-
-                </p>
-
-              </div>
-            )}
-
-          </div>
-
+            </div>
+          ))}
         </div>
 
       </div>
