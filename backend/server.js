@@ -81,10 +81,11 @@ app.post(
         });
 
       // Save to MongoDB
-      await Transcription.create({
-        fileName: req.file.originalname,
-        transcription: transcription.text,
-      });
+     await Transcription.create({
+  fileName: req.file.originalname,
+  transcription: transcription.text,
+  userEmail: req.body.userEmail,
+});
 
       res.json({
         message: "File uploaded successfully",
