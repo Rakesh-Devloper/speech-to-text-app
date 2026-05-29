@@ -7,6 +7,7 @@ const cors = require("cors");
 const multer = require("multer");
 const mongoose = require("mongoose");
 const fs = require("fs");
+const path = require("path");
 
 const Groq = require("groq-sdk");
 
@@ -22,18 +23,22 @@ const client = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
 
+const uploadsDir = path.join(__dirname, "uploads");
+
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
 // Multer Storage
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/");
+    cb(null, uploadsDir);
   },
 
   filename: (req, file, cb) => {
     cb(
       null,
-      Date.now() +
-        "-" +
-        file.originalname
+      Date.now() + "-" + file.originalname
     );
   },
 });
@@ -91,6 +96,7 @@ app.post(
 
       if (!req.file) {
 
+        
         return res.status(400).json({
           error:
             "No audio file uploaded",
@@ -106,24 +112,25 @@ app.post(
         "FILE:",
         req.file
       );
+      console.log("FILE PATH:", req.file.path);
+console.log("FILE EXISTS:", fs.existsSync(req.file.path));
 
       // Whisper Transcription
-      const transcription =
-        await client.audio.transcriptions.create(
-          {
-            file:
-              fs.createReadStream(
-                req.file.path
-              ),
+     console.log("FILE PATH:", req.file.path);
+console.log("FILE EXISTS:", fs.existsSync(req.file.path));
 
-            model:
-              "whisper-large-v3",
+if (!fs.existsSync(req.file.path)) {
+  return res.status(500).json({
+    error: `File not found: ${req.file.path}`,
+  });
+}
 
-            response_format:
-              "json",
-          }
-        );
-
+const transcription =
+  await client.audio.transcriptions.create({
+    file: fs.createReadStream(req.file.path),
+    model: "whisper-large-v3",
+    response_format: "json",
+  });
       // Save to MongoDB
       await Transcription.create({
         fileName:
