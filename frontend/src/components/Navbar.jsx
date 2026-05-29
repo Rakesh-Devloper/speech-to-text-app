@@ -7,9 +7,7 @@ import {
 } from "@clerk/clerk-react";
 
 function Navbar() {
-
   return (
-
     <nav
       className="
       flex
@@ -24,10 +22,8 @@ function Navbar() {
       text-white
     "
     >
-
       {/* LOGO */}
       <Link to="/">
-
         <h1
           className="
           text-4xl
@@ -39,11 +35,8 @@ function Navbar() {
           text-transparent
         "
         >
-
           TranscriptoAI
-
         </h1>
-
       </Link>
 
       {/* RIGHT SIDE */}
@@ -61,33 +54,34 @@ function Navbar() {
           Home
         </Link>
 
-        {/* HISTORY */}
-        <Link
-          to="/history"
-          className="
-          text-lg
-          hover:text-green-400
-          transition
-        "
-        >
-          History
-        </Link>
+        {/* HISTORY ONLY AFTER LOGIN */}
+        <SignedIn>
+          <Link
+            to="/history"
+            className="
+            text-lg
+            hover:text-green-400
+            transition
+          "
+          >
+            History
+          </Link>
+        </SignedIn>
 
         {/* LOGGED OUT */}
         <SignedOut>
-
           <Link
             to="/sign-in"
             className="
             text-lg
             hover:text-green-400
+            transition
           "
           >
             Login
           </Link>
 
           <Link to="/sign-up">
-
             <button
               className="
               bg-white
@@ -100,24 +94,17 @@ function Navbar() {
               transition
             "
             >
-
               Get Started
-
             </button>
-
           </Link>
-
         </SignedOut>
 
         {/* LOGGED IN */}
         <SignedIn>
-
-          <UserButton />
-
+          <UserButton afterSignOutUrl="/" />
         </SignedIn>
 
       </div>
-
     </nav>
   );
 }

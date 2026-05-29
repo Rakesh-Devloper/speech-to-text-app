@@ -7,11 +7,9 @@ import {
   SignIn,
   SignUp,
 } from "@clerk/clerk-react";
-
 import Home from "./pages/Home";
-
 import Navbar from "./components/Navbar";
-
+import History from "./pages/History";
 function AuthLayout({ children }) {
 
   return (
@@ -70,6 +68,10 @@ function App() {
         path="/"
         element={<Home />}
       />
+      <Route
+  path="/history"
+  element={<History />}
+/>
 
       {/* SIGN IN */}
       <Route
@@ -94,6 +96,7 @@ function App() {
           </AuthLayout>
         }
       />
+
 
     </Routes>
   );

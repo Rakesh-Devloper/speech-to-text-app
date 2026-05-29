@@ -61,7 +61,7 @@ function UploadSection() {
     );
 
     const response = await fetch(
-      "http://localhost:5000/upload",
+      "https://speech-to-text-app-1-srz0.onrender.com/upload",
       {
         method: "POST",
         body: formData,

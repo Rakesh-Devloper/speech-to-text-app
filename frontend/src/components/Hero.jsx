@@ -1,9 +1,10 @@
+import { useUser } from "@clerk/clerk-react";
 import { Link } from "react-router-dom";
 
-function Hero() {
+function Hero({ scrollToUpload }) {
+  const { isSignedIn } = useUser();
 
   return (
-
     <section
       className="
       min-h-[80vh]
@@ -17,15 +18,10 @@ function Hero() {
       text-white
     "
     >
-
-      {/* SMALL TEXT */}
       <p className="text-green-400 text-2xl mb-6">
-
         AI Powered Speech-To-Text Platform
-
       </p>
 
-      {/* TITLE */}
       <h1
         className="
         text-6xl
@@ -34,20 +30,13 @@ function Hero() {
         leading-tight
       "
       >
-
         Convert Voice Into
-
         <br />
-
         <span className="text-green-400">
-
           Smart Text
-
         </span>
-
       </h1>
 
-      {/* DESCRIPTION */}
       <p
         className="
         text-gray-400
@@ -57,18 +46,14 @@ function Hero() {
         leading-relaxed
       "
       >
-
         Upload audio files or record your voice live and
         generate accurate AI-powered transcriptions instantly.
-
       </p>
 
-      {/* BUTTON */}
       <div className="mt-14">
-
-        <Link to="/sign-up">
-
+        {isSignedIn ? (
           <button
+            onClick={scrollToUpload}
             className="
             bg-green-500
             hover:bg-green-400
@@ -82,15 +67,29 @@ function Hero() {
             transition-all
           "
           >
-
             Get Started
-
           </button>
-
-        </Link>
-
+        ) : (
+          <Link to="/sign-up">
+            <button
+              className="
+              bg-green-500
+              hover:bg-green-400
+              text-black
+              font-bold
+              text-2xl
+              px-14
+              py-5
+              rounded-2xl
+              shadow-[0_0_40px_rgba(34,197,94,0.5)]
+              transition-all
+            "
+            >
+              Get Started
+            </button>
+          </Link>
+        )}
       </div>
-
     </section>
   );
 }
