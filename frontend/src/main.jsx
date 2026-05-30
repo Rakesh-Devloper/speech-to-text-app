@@ -20,8 +20,13 @@ ReactDOM.createRoot(
 
   <React.StrictMode>
 
-    <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
-
+<ClerkProvider
+  publishableKey={PUBLISHABLE_KEY}
+  signInUrl="/sign-in"
+  signUpUrl="/sign-up"
+  afterSignInUrl="/"
+  afterSignUpUrl="/"
+>
       <BrowserRouter>
 
         <App />
