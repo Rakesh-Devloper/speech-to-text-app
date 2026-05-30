@@ -13,7 +13,10 @@ function UploadSection() {
     useState(null);
 
   const [transcription, setTranscription] =
-    useState("");
+  useState("");
+
+const [loading, setLoading] =
+  useState(false);
 
   // Select File
   const handleFileChange = (e) => {
@@ -22,8 +25,7 @@ function UploadSection() {
       e.target.files[0]
     );
   };
-
-  const handleUpload = async () => {
+const handleUpload = async () => {
 
   // USER NOT LOGGED IN
   if (!user) {
@@ -40,6 +42,8 @@ function UploadSection() {
 
     return;
   }
+
+  setLoading(true);
 
   try {
 
@@ -81,6 +85,10 @@ function UploadSection() {
   } catch (error) {
 
     console.log(error);
+
+  } finally {
+
+    setLoading(false);
   }
 };
 
@@ -199,26 +207,29 @@ function UploadSection() {
           )}
 
           <button
-            onClick={handleUpload}
-            className="
-            px-10 py-4
-            rounded-2xl
-            font-bold
-            text-lg
-            bg-gradient-to-r
-            from-green-400
-            to-green-500
-            text-black
-            shadow-[0_0_25px_rgba(34,197,94,0.4)]
-            hover:scale-105
-            hover:shadow-[0_0_40px_rgba(34,197,94,0.7)]
-            transition-all duration-300
-          "
-          >
-
-            ⚡ Generate Transcript
-
-          </button>
+  onClick={handleUpload}
+  disabled={loading}
+  className="
+  px-10 py-4
+  rounded-2xl
+  font-bold
+  text-lg
+  bg-gradient-to-r
+  from-green-400
+  to-green-500
+  text-black
+  shadow-[0_0_25px_rgba(34,197,94,0.4)]
+  hover:scale-105
+  hover:shadow-[0_0_40px_rgba(34,197,94,0.7)]
+  transition-all duration-300
+  disabled:opacity-50
+  disabled:cursor-not-allowed
+"
+>
+  {loading
+    ? "⏳ Transcribing..."
+    : "⚡ Generate Transcript"}
+</button>
 
         </div>
 
